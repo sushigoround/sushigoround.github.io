@@ -48,9 +48,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 레벨 및 속도 관련 변수 추가
     let level = 1;
-    const LEVEL_UP_SCORE = 200; // 이 점수마다 레벨업
+    const LEVEL_UP_SCORE = 1000; // 이 점수마다 레벨업
     const DROP_INTERVAL_DECREMENT = 50; // 레벨업마다 하강 시간 감소량 (ms)
     const MIN_DROP_INTERVAL = 100; // 최소 하강 시간
+
+    // 전체 화면 모드 진입 함수
+    function enterFullscreen() {
+        const element = document.documentElement; // 전체 문서를 전체 화면으로
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) { /* Firefox */
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) { /* IE/Edge */
+            element.msRequestFullscreen();
+        }
+    }
 
     // 블록 객체 생성
     function createPiece(shape) {
@@ -279,6 +293,13 @@ document.addEventListener('DOMContentLoaded', function() {
             context.font = '30px Arial';
             context.textAlign = 'center';
             context.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+            // 일시정지 시 전체 화면 해제 (선택 사항)
+            // if (document.fullscreenElement) {
+            //     document.exitFullscreen();
+            // }
+        } else {
+            // 게임 재개 시 전체 화면 모드 진입 시도
+            enterFullscreen();
         }
     }
 
@@ -301,14 +322,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 모바일 버튼 이벤트 리스너
-    document.getElementById('left-btn').addEventListener('click', () => !paused && !gameOver && pieceMove(-1));
-    document.getElementById('right-btn').addEventListener('click', () => !paused && !gameOver && pieceMove(1));
-    document.getElementById('down-btn').addEventListener('click', () => !paused && !gameOver && pieceDrop());
-    document.getElementById('rotate-btn').addEventListener('click', () => !paused && !gameOver && rotatePiece());
-    document.getElementById('hold-btn').addEventListener('click', () => !paused && !gameOver && holdPiece());
-    pauseBtn.addEventListener('click', togglePause);
+    // 각 버튼 클릭 시 event.preventDefault()를 추가하여 기본 브라우저 동작을 방지합니다.
+    document.getElementById('left-btn').addEventListener('click', (event) => {
+        event.preventDefault();
+        !paused && !gameOver && pieceMove(-1);
+    });
+    document.getElementById('right-btn').addEventListener('click', (event) => {
+        event.preventDefault();
+        !paused && !gameOver && pieceMove(1);
+    });
+    document.getElementById('down-btn').addEventListener('click', (event) => {
+        event.preventDefault();
+        !paused && !gameOver && pieceDrop();
+    });
+    document.getElementById('rotate-btn').addEventListener('click', (event) => {
+        event.preventDefault();
+        !paused && !gameOver && rotatePiece();
+    });
+    document.getElementById('hold-btn').addEventListener('click', (event) => {
+        event.preventDefault();
+        !paused && !gameOver && holdPiece();
+    });
+    pauseBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        togglePause();
+    });
 
-    // 게임 시작
+    // 게임 시작 시 전체 화면 모드 진입 시도 (사용자 상호작용 후)
+    // 게임 시작 시 바로 전체 화면으로 진입하는 것은 브라우저 정책상 불가능합니다.
+    // 따라서 '일시정지 해제' 버튼을 누르거나, 게임 시작 시 별도의 "전체 화면으로 플레이" 버튼을 두는 것이 좋습니다.
+    // 여기서는 일시정지 해제 시 전체 화면으로 진입하도록 연결했습니다.
+
     resetPiece();
     gameLoop();
 });
