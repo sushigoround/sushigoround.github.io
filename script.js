@@ -46,6 +46,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let dropInterval = 1000; // 1초마다 블록 하강
     let lastTime = 0;
 
+    // 레벨 및 속도 관련 변수 추가
+    let level = 1;
+    const LEVEL_UP_SCORE = 1000; // 이 점수마다 레벨업
+    const DROP_INTERVAL_DECREMENT = 50; // 레벨업마다 하강 시간 감소량 (ms)
+    const MIN_DROP_INTERVAL = 100; // 최소 하강 시간
+
     // 블록 객체 생성
     function createPiece(shape) {
         const colorIndex = SHAPES.indexOf(shape);
@@ -117,8 +123,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const lineScores = [0, 100, 300, 500, 800];
             score += lineScores[lines];
             scoreElement.innerText = score;
+
+            // 점수에 따라 레벨업
+            if (score >= level * LEVEL_UP_SCORE) {
+                levelUp();
+            }
         }
     }
+
+    // 레벨업 함수
+    function levelUp() {
+        level++;
+        dropInterval = Math.max(MIN_DROP_INTERVAL, dropInterval - DROP_INTERVAL_DECREMENT);
+        console.log(`Level Up! Current Level: ${level}, Drop Interval: ${dropInterval}ms`);
+        // 필요하다면 여기에 레벨 표시를 업데이트하는 코드 추가
+    }
+
 
     // 블록 회전
     function rotatePiece() {
