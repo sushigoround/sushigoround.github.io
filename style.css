@@ -62,8 +62,8 @@ button:hover {
     gap: 10px;
 }
 
-/* 모바일 화면 (가로 1024px 이하) */
-@media (max-width: 1024px) {
+/* 모바일 화면 (가로 768px 이하) */
+@media (max-width: 768px) {
     .game-container {
         flex-direction: column-reverse; /* 게임 보드를 위로 */
         align-items: center;
