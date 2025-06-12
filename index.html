@@ -1,14 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <title>테트리스</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>테트리스 게임</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #111;
+      color: white;
+    }
+    canvas {
+      border: 2px solid #fff;
+      background: #222;
+      margin-top: 20px;
+    }
+    #info {
+      margin-top: 1rem;
+      text-align: center;
+    }
+    button {
+      margin: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+  </style>
 </head>
 <body>
-  <h1>테트리스</h1>
-  <canvas id="tetris" width="240" height="400"></canvas>
-  <div>
-    점수: <span id="score">0</span>
+  <h1>🎮 테트리스</h1>
+  <canvas id="game" width="240" height="400"></canvas>
+  <div id="info">
+    <div>점수: <span id="score">0</span></div>
+    <div>최고 점수: <span id="highscore">0</span></div>
+    <button onclick="restart()">🔁 다시 시작</button>
   </div>
   <script src="tetris.js"></script>
 </body>
