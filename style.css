@@ -67,6 +67,7 @@ button:hover {
     .game-container {
         flex-direction: column-reverse; /* 게임 보드를 위로 */
         align-items: center;
+         margin-bottom: 20px; /* 컨트롤 위로 여백 추가 */
     }
     .side-panel {
         flex-direction: row;
