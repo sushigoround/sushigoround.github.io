@@ -52,6 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const DROP_INTERVAL_DECREMENT = 50; // 레벨업마다 하강 시간 감소량 (ms)
     const MIN_DROP_INTERVAL = 100; // 최소 하강 시간
 
+    // 소프트 드롭 관련 변수
+    const SOFT_DROP_INTERVAL = 50; // 소프트 드롭 시 하강 간격 (ms)
+    let isSoftDropping = false; // 소프트 드롭 중인지 여부
+
     // 전체 화면 모드 진입 함수
     function enterFullscreen() {
         const element = document.documentElement; // 전체 문서를 전체 화면으로
@@ -182,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             clearLines();
             resetPiece();
         }
-        dropCounter = 0;
+        dropCounter = 0; // 블록이 착지하면 드롭 카운터 초기화
     }
 
     // 블록 좌우 이동
@@ -273,8 +277,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!paused) {
             const deltaTime = time - lastTime;
             lastTime = time;
+
+            // 소프트 드롭 중이면 더 빠른 간격 사용
             dropCounter += deltaTime;
-            if (dropCounter > dropInterval) {
+            const currentDropInterval = isSoftDropping ? SOFT_DROP_INTERVAL : dropInterval;
+
+            if (dropCounter > currentDropInterval) {
                 pieceDrop();
             }
             draw();
@@ -308,7 +316,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (gameOver || paused) return;
         if (event.key === 'ArrowLeft') pieceMove(-1);
         else if (event.key === 'ArrowRight') pieceMove(1);
-        else if (event.key === 'ArrowDown') pieceDrop();
+        else if (event.key === 'ArrowDown') {
+            if (!isSoftDropping) { // 이미 소프트 드롭 중이 아니면 시작
+                isSoftDropping = true;
+                dropCounter = SOFT_DROP_INTERVAL; // 즉시 한 번 내려가도록 설정
+            }
+        }
         else if (event.key === 'ArrowUp' || event.key.toLowerCase() === 'x') rotatePiece();
         else if (event.key.toLowerCase() === ' ') { // Hard Drop
             while (!isCollision(piece)) {
@@ -321,8 +334,28 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (event.key.toLowerCase() === 'p') togglePause();
     });
 
+    document.addEventListener('keyup', event => {
+        if (event.key === 'ArrowDown') {
+            isSoftDropping = false; // 키를 떼면 소프트 드롭 종료
+        }
+    });
+
     // 모바일 버튼 이벤트 리스너
-    // 각 버튼 클릭 시 event.preventDefault()를 추가하여 기본 브라우저 동작을 방지합니다.
+    const downBtn = document.getElementById('down-btn');
+
+    downBtn.addEventListener('touchstart', (event) => {
+        event.preventDefault();
+        if (gameOver || paused) return;
+        isSoftDropping = true;
+        dropCounter = SOFT_DROP_INTERVAL; // 즉시 한 번 내려가도록 설정
+    });
+
+    downBtn.addEventListener('touchend', (event) => {
+        event.preventDefault();
+        isSoftDropping = false;
+    });
+
+    // 다른 모바일 버튼들
     document.getElementById('left-btn').addEventListener('click', (event) => {
         event.preventDefault();
         !paused && !gameOver && pieceMove(-1);
@@ -330,10 +363,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('right-btn').addEventListener('click', (event) => {
         event.preventDefault();
         !paused && !gameOver && pieceMove(1);
-    });
-    document.getElementById('down-btn').addEventListener('click', (event) => {
-        event.preventDefault();
-        !paused && !gameOver && pieceDrop();
     });
     document.getElementById('rotate-btn').addEventListener('click', (event) => {
         event.preventDefault();
@@ -348,11 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
         togglePause();
     });
 
-    // 게임 시작 시 전체 화면 모드 진입 시도 (사용자 상호작용 후)
-    // 게임 시작 시 바로 전체 화면으로 진입하는 것은 브라우저 정책상 불가능합니다.
-    // 따라서 '일시정지 해제' 버튼을 누르거나, 게임 시작 시 별도의 "전체 화면으로 플레이" 버튼을 두는 것이 좋습니다.
-    // 여기서는 일시정지 해제 시 전체 화면으로 진입하도록 연결했습니다.
-
+    // 게임 시작
     resetPiece();
     gameLoop();
 });
