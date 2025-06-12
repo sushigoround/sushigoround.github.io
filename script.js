@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 레벨 및 속도 관련 변수 추가
     let level = 1;
-    const LEVEL_UP_SCORE = 1000; // 이 점수마다 레벨업
+    const LEVEL_UP_SCORE = 200; // 이 점수마다 레벨업
     const DROP_INTERVAL_DECREMENT = 50; // 레벨업마다 하강 시간 감소량 (ms)
     const MIN_DROP_INTERVAL = 100; // 최소 하강 시간
 
